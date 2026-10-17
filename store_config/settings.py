@@ -86,9 +86,3 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # So san pham toi thieu truoc khi bao "sap het hang".
 LOW_STOCK_THRESHOLD = 5
-
-# Dang nhap: chua dang nhap ma bam them / sua / xoa thi chuyen sang trang dang nhap,
-# dang nhap xong (hoac dang xuat) quay ve danh sach san pham.
-LOGIN_URL = "login"
-LOGIN_REDIRECT_URL = "inventory:product_list"
-LOGOUT_REDIRECT_URL = "inventory:product_list"

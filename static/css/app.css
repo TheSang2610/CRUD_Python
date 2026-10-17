@@ -92,8 +92,6 @@ a { color: var(--blue); }
     color: #4d6b87; text-decoration: none; font-size: 12px; font-weight: 600;
 }
 .side-link:hover { border-color: #a9ccea; color: #126ac1; }
-/* Nut dang xuat (form POST) trong giong het link ben canh. */
-.side-button { width: 100%; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
 
 .content { min-width: 0; }
 

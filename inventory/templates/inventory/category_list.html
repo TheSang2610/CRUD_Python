@@ -10,17 +10,12 @@
 <section class="split">
     <div class="panel">
         <h2 class="section-title">Thêm danh mục</h2>
-        {% if user.is_authenticated %}
         <form method="post" action="{% url 'inventory:category_create' %}" novalidate>
             {% csrf_token %}
             {% include "inventory/_field.html" with field=form.name %}
             {% include "inventory/_field.html" with field=form.description %}
             <button type="submit" class="btn btn-primary btn-block">Thêm danh mục</button>
         </form>
-        {% else %}
-        <p class="field-help">Cần đăng nhập để thêm, sửa hoặc xóa danh mục.</p>
-        <a href="{% url 'login' %}?next={{ request.path|urlencode }}" class="btn btn-primary btn-block">Đăng nhập</a>
-        {% endif %}
     </div>
 
     <div class="panel">

@@ -9,12 +9,8 @@ cua ban goc. Moi thao tac CRUD tach thanh mot trang rieng:
     Xoa         ProductDeleteView  GET (hoi lai) / POST (xoa that) /store/<pk>/xoa/
 
 Danh muc cung du CRUD tuong tu duoi /store/danh-muc/, trang chi tiet liet ke san pham.
-
-Xem (danh sach, chi tiet) thi ai cung vao duoc; them / sua / xoa phai dang nhap
-(LoginRequiredMixin dat DAU TIEN trong danh sach lop cha de chan truoc khi chay view).
 """
 from django.conf import settings
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Count, DecimalField, ExpressionWrapper, F, Prefetch, Q, Sum
@@ -69,13 +65,6 @@ class ProductListView(ListView):
         sort = params.get("sort", "newest")
         order = SORT_OPTIONS.get(sort, SORT_OPTIONS["newest"])[0]
         return qs.order_by(order, "-pk")
-
-    def paginate_queryset(self, queryset, page_size):
-        # Mac dinh Django bao 404 khi go ?page=99 hay ?page=abc. get_page() tu dua
-        # ve trang cuoi / trang dau thay vi bao loi.
-        paginator = self.get_paginator(queryset, page_size)
-        page = paginator.get_page(self.request.GET.get(self.page_kwarg))
-        return paginator, page, page.object_list, page.has_other_pages()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -138,7 +127,7 @@ class ProductDetailView(DetailView):
     context_object_name = "product"
 
 
-class ProductCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class ProductCreateView(SuccessMessageMixin, CreateView):
     model = Product
     form_class = ProductForm
     template_name = "inventory/product_form.html"
@@ -154,7 +143,7 @@ class ProductCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         return initial
 
 
-class ProductUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class ProductUpdateView(SuccessMessageMixin, UpdateView):
     model = Product
     form_class = ProductForm
     template_name = "inventory/product_form.html"
@@ -164,7 +153,7 @@ class ProductUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         return self.object.get_absolute_url()
 
 
-class ProductDeleteView(LoginRequiredMixin, DeleteView):
+class ProductDeleteView(DeleteView):
     """
     Ban goc xoa ngay khi mo link (GET) - trinh duyet tai truoc link hay bam nham
     la mat du lieu. O day GET chi hien trang hoi lai, POST moi xoa that.
@@ -225,7 +214,7 @@ class CategoryDetailView(DetailView):
         return context
 
 
-class CategoryCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class CategoryCreateView(SuccessMessageMixin, CreateView):
     model = Category
     form_class = CategoryForm
     template_name = "inventory/category_form.html"
@@ -233,7 +222,7 @@ class CategoryCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     success_message = "Đã thêm danh mục “%(name)s”."
 
 
-class CategoryUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class CategoryUpdateView(SuccessMessageMixin, UpdateView):
     model = Category
     form_class = CategoryForm
     template_name = "inventory/category_form.html"
@@ -241,7 +230,7 @@ class CategoryUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     success_message = "Đã đổi danh mục thành “%(name)s”."
 
 
-class CategoryDeleteView(LoginRequiredMixin, DeleteView):
+class CategoryDeleteView(DeleteView):
     model = Category
     template_name = "inventory/confirm_delete.html"
     success_url = reverse_lazy("inventory:category_list")

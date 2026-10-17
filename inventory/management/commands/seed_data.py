@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
 from inventory.models import Category, Product
@@ -20,10 +19,6 @@ SAMPLE = {
         ("CASE-17PM", "Ốp lưng silicone iPhone 17 Pro Max", 1390000, 5, "Hỗ trợ MagSafe."),
     ],
 }
-
-# Tai khoan mau de thay/ban dang nhap thu. Chi dung de demo - dung that thi doi mat khau.
-DEMO_USERNAME = "quanly"
-DEMO_PASSWORD = "quanly123"
 
 # Ma SKU cua bo du lieu mau cu (quan ao / do dien tu / van phong pham).
 OLD_SAMPLE_SKUS = ["AO-001", "AO-002", "QU-001", "DT-001", "DT-002", "DT-003", "VP-001", "VP-002", "VP-003"]
@@ -60,11 +55,5 @@ class Command(BaseCommand):
                     },
                 )
                 created += is_new
-        User = get_user_model()
-        if not User.objects.filter(username=DEMO_USERNAME).exists():
-            # is_staff: vao duoc ca trang /admin/ cua Django.
-            User.objects.create_user(DEMO_USERNAME, password=DEMO_PASSWORD, is_staff=True, is_superuser=True)
-            self.stdout.write(f"Da tao tai khoan mau: {DEMO_USERNAME} / {DEMO_PASSWORD}")
-
         # Khong dau: cua so lenh Windows mac dinh (cp1252) in tieng Viet co dau se bao loi.
         self.stdout.write(self.style.SUCCESS(f"Da them {created} san pham mau."))

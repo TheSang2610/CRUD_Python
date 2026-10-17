@@ -1,5 +1,4 @@
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm
 
 from .models import Category, Product
 
@@ -25,10 +24,6 @@ class StyledFormMixin:
             field.widget.attrs.setdefault("class", css)
 
 
-class LoginForm(StyledFormMixin, AuthenticationForm):
-    """Form dang nhap co san cua Django, chi them class CSS cho o nhap."""
-
-
 class ProductForm(StyledFormMixin, forms.ModelForm):
     """
     Ban goc doc tung o bang request.POST.get() roi luu thang, nen nhap gia am
@@ -39,16 +34,12 @@ class ProductForm(StyledFormMixin, forms.ModelForm):
         model = Product
         fields = ["name", "sku", "category", "price", "quantity", "description", "is_active"]
         widgets = {
-            "name": forms.TextInput(attrs={"placeholder": "Vd: iPhone 17 Pro 256GB"}),
-            "sku": forms.TextInput(attrs={"placeholder": "Vd: IP17P-256"}),
+            "name": forms.TextInput(attrs={"placeholder": "Vd: Áo thun basic"}),
+            "sku": forms.TextInput(attrs={"placeholder": "Vd: AO-001"}),
             "price": forms.NumberInput(attrs={"min": 0, "step": 1000, "placeholder": "Vd: 150000"}),
             "quantity": forms.NumberInput(attrs={"min": 0}),
-            "description": forms.Textarea(attrs={"rows": 4, "placeholder": "Màn hình, chip, dung lượng, màu sắc..."}),
+            "description": forms.Textarea(attrs={"rows": 4, "placeholder": "Chất liệu, kích cỡ, màu sắc..."}),
         }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["category"].empty_label = "— Chưa phân loại —"
 
     def clean_name(self):
         name = normalize(self.cleaned_data["name"])
@@ -57,7 +48,7 @@ class ProductForm(StyledFormMixin, forms.ModelForm):
         return name
 
     def clean_sku(self):
-        # Luu SKU chu hoa de "ip17-128" va "IP17-128" khong thanh 2 san pham.
+        # Luu SKU chu hoa de "ao-001" va "AO-001" khong thanh 2 san pham.
         sku = self.cleaned_data["sku"].strip().upper()
         if " " in sku:
             raise forms.ValidationError("Mã SKU không được chứa khoảng trắng.")
@@ -90,7 +81,7 @@ class CategoryForm(StyledFormMixin, forms.ModelForm):
         model = Category
         fields = ["name", "description"]
         widgets = {
-            "name": forms.TextInput(attrs={"placeholder": "Vd: Phụ kiện"}),
+            "name": forms.TextInput(attrs={"placeholder": "Vd: Thời trang"}),
             "description": forms.TextInput(attrs={"placeholder": "Mô tả ngắn (không bắt buộc)"}),
         }
 

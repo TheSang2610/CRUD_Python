@@ -9,22 +9,16 @@ vào `static/img/` rồi sửa đường dẫn trong `templates/base.html`.
 ## Chạy project
 
 ```powershell
-cd CRUD_Python
+cd QuanLyCuaHang_Django
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
 python manage.py migrate
-python manage.py seed_data        # tạo 3 danh mục, 9 sản phẩm iPhone mẫu và tài khoản quanly
+python manage.py seed_data        # tạo 3 danh mục + 9 sản phẩm iPhone mẫu (tùy chọn)
 python manage.py runserver
 ```
 
 Mở http://127.0.0.1:8000/store/
-
-## Đăng nhập
-
-- Ai cũng **xem** được danh sách và chi tiết; **thêm / sửa / xóa** phải đăng nhập.
-- Tài khoản mẫu (do `seed_data` tạo): **quanly / quanly123**. Chỉ dùng để demo.
-- Tự tạo tài khoản khác: `python manage.py createsuperuser`.
 
 - Trang quản trị Django: http://127.0.0.1:8000/admin/ (tạo tài khoản bằng `python manage.py createsuperuser`)
 - Chạy test: `python manage.py test inventory`
@@ -41,10 +35,9 @@ inventory/             app chính
   admin.py             đăng ký model vào trang admin
   templatetags/money.py   filter |vnd  (150000 -> 150.000 ₫)
   management/commands/seed_data.py   lệnh tạo dữ liệu mẫu
-  tests.py             29 test
+  tests.py             13 test
   templates/inventory/ các trang của app
 templates/base.html    khung trang dùng chung (thanh bên, tiêu đề, thông báo)
-templates/registration/login.html   trang đăng nhập
 static/css/app.css     giao diện
 ```
 
@@ -62,5 +55,4 @@ static/css/app.css     giao diện
 | Template | 1 file `index.html` | `base.html` + kế thừa `{% extends %}`, `{% include %}` cho ô nhập |
 | Giá tiền | `150000đ` | Filter tự viết: `150.000 ₫` |
 | Cài đặt | `en-us`, `UTC` | Tiếng Việt, giờ Việt Nam; khóa bí mật đọc từ biến môi trường |
-| Đăng nhập | Không có | Thêm / sửa / xóa cần đăng nhập (`LoginRequiredMixin`), xem thì không |
-| Test | Không có | 29 test (model, form, view, đăng nhập, phân trang) |
+| Test | Không có | 13 test (model, form, view) |

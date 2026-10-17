@@ -31,7 +31,7 @@ class Product(models.Model):
 
     name = models.CharField("Tên sản phẩm", max_length=255)
     sku = models.CharField(
-        "Mã SKU", max_length=30, unique=True, help_text="Mã riêng của từng sản phẩm, vd: IP17P-256"
+        "Mã SKU", max_length=30, unique=True, help_text="Mã riêng của từng sản phẩm, vd: AO-001"
     )
     # Xoa danh muc thi san pham van con, chi mat danh muc (SET_NULL).
     category = models.ForeignKey(

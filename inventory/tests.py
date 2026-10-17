@@ -1,16 +1,8 @@
-from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
 from .forms import CategoryForm, ProductForm
 from .models import Category, Product
-
-
-def login(client):
-    """Them / sua / xoa can dang nhap; tao nhanh mot tai khoan va dang nhap."""
-    user = get_user_model().objects.create_user("tester", password="matkhau-test-123")
-    client.force_login(user)
-    return user
 
 
 class ProductModelTests(TestCase):
@@ -52,7 +44,6 @@ class ProductViewTests(TestCase):
             name="Áo sơ mi", sku="AO-002", price=300000, quantity=0, category=self.fashion
         )
         self.mouse = Product.objects.create(name="Chuột", sku="DT-003", price=199000, quantity=25)
-        login(self.client)
 
     def test_list_search_by_name_or_sku(self):
         res = self.client.get(reverse("inventory:product_list"), {"q": "dt-003"})
@@ -107,7 +98,6 @@ class DuplicateTests(TestCase):
         self.new = Category.objects.create(name="iPhone mới")
         self.used = Category.objects.create(name="iPhone cũ")
         self.p = Product.objects.create(name="iPhone 15 128GB", sku="IP15", price=1000, category=self.new)
-        login(self.client)
 
     def product_data(self, **overrides):
         base = {"name": "iPhone 15 128GB", "sku": "IP15-B", "price": 1000, "quantity": 1, "category": self.new.pk}
@@ -169,54 +159,3 @@ class CategoryDetailTests(TestCase):
         Product.objects.create(name="AirPods Pro 3", sku="APP3", price=1000, category=a)
         res = self.client.get(reverse("inventory:category_list"))
         self.assertContains(res, "AirPods Pro 3")
-
-
-class LoginRequiredTests(TestCase):
-    def setUp(self):
-        self.cat = Category.objects.create(name="Phụ kiện")
-        self.p = Product.objects.create(name="Sạc MagSafe", sku="MS-1", price=1000, quantity=3, category=self.cat)
-
-    def test_guest_can_view(self):
-        for url in [reverse("inventory:product_list"), self.p.get_absolute_url(), reverse("inventory:category_list")]:
-            self.assertEqual(self.client.get(url).status_code, 200, url)
-
-    def test_guest_is_sent_to_login_for_changes(self):
-        urls = [
-            reverse("inventory:product_create"),
-            reverse("inventory:product_update", args=[self.p.pk]),
-            reverse("inventory:product_delete", args=[self.p.pk]),
-            reverse("inventory:category_create"),
-            reverse("inventory:category_update", args=[self.cat.pk]),
-            reverse("inventory:category_delete", args=[self.cat.pk]),
-        ]
-        for url in urls:
-            res = self.client.get(url)
-            self.assertEqual(res.status_code, 302, url)
-            self.assertIn(reverse("login"), res["Location"])
-
-    def test_guest_post_delete_does_nothing(self):
-        self.client.post(reverse("inventory:product_delete", args=[self.p.pk]))
-        self.assertTrue(Product.objects.filter(pk=self.p.pk).exists())
-
-    def test_login_then_logout(self):
-        get_user_model().objects.create_user("quanly", password="quanly123")
-        res = self.client.post(reverse("login"), {"username": "quanly", "password": "quanly123"})
-        self.assertRedirects(res, reverse("inventory:product_list"))
-        self.assertEqual(self.client.get(reverse("inventory:product_create")).status_code, 200)
-        self.client.post(reverse("logout"))
-        self.assertEqual(self.client.get(reverse("inventory:product_create")).status_code, 302)
-
-    def test_wrong_password_shows_error(self):
-        get_user_model().objects.create_user("quanly", password="quanly123")
-        res = self.client.post(reverse("login"), {"username": "quanly", "password": "sai"})
-        self.assertContains(res, "Sai tên đăng nhập hoặc mật khẩu")
-
-
-class PaginationTests(TestCase):
-    def test_out_of_range_or_bad_page_does_not_404(self):
-        for i in range(10):
-            Product.objects.create(name=f"SP {i}", sku=f"SP-{i}", price=1000)
-        for page in ["99", "abc", "0"]:
-            res = self.client.get(reverse("inventory:product_list"), {"page": page})
-            self.assertEqual(res.status_code, 200, page)
-        self.assertEqual(self.client.get(reverse("inventory:product_list"), {"page": "99"}).context["page_obj"].number, 2)
