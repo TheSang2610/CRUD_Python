@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load money %}
+
+{% block title %}{{ product.name }}{% endblock %}
+{% block breadcrumb %}<span>›</span><a href="{% url 'inventory:product_list' %}">Sản phẩm</a><span>›</span><span>{{ product.sku }}</span>{% endblock %}
+{% block eyebrow %}CHI TIẾT SẢN PHẨM{% endblock %}
+{% block heading %}{{ product.name }}{% endblock %}
+{% block actions %}
+    <a href="{% url 'inventory:product_update' product.pk %}" class="btn btn-dark">Sửa</a>
+    <a href="{% url 'inventory:product_delete' product.pk %}" class="btn btn-danger-ghost">Xóa</a>
+{% endblock %}
+
+{% block content %}
+<section class="detail">
+    <div class="panel">
+        <div class="detail-top">
+            <code class="sku">{{ product.sku }}</code>
+            <span class="badge badge-{{ product.stock_status }}">{{ product.stock_label }}</span>
+            {% if not product.is_active %}<span class="tag">Ngừng bán</span>{% endif %}
+        </div>
+        <p class="price-big">{{ product.price|vnd }}</p>
+        <h2 class="section-title">Mô tả</h2>
+        <p class="prose">{{ product.description|default:"Chưa có mô tả."|linebreaksbr }}</p>
+    </div>
+
+    <dl class="panel facts">
+        <div><dt>Danh mục</dt><dd>{% if product.category %}<a href="{{ product.category.get_absolute_url }}">{{ product.category }}</a>{% else %}Chưa phân loại{% endif %}</dd></div>
+        <div><dt>Số lượng tồn</dt><dd>{{ product.quantity }}</dd></div>
+        <div><dt>Giá trị tồn kho</dt><dd>{{ product.stock_value|vnd }}</dd></div>
+        <div><dt>Ngày tạo</dt><dd>{{ product.created_at|date:"d/m/Y H:i" }}</dd></div>
+        <div><dt>Cập nhật lần cuối</dt><dd>{{ product.updated_at|date:"d/m/Y H:i" }}</dd></div>
+    </dl>
+</section>
+{% endblock %}

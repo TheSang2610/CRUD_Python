@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% load money %}
+
+{% block title %}Sản phẩm{% endblock %}
+{% block breadcrumb %}<span>›</span><span>Sản phẩm</span>{% endblock %}
+{% block eyebrow %}DANH MỤC KINH DOANH{% endblock %}
+{% block heading %}Quản lý <span>sản phẩm</span>{% endblock %}
+{% block lead %}<p class="lead">Theo dõi giá bán, tồn kho và tình trạng của từng mặt hàng.</p>{% endblock %}
+{% block actions %}
+    <a href="{% url 'inventory:category_list' %}" class="btn">Danh mục</a>
+    <a href="{% url 'inventory:product_create' %}" class="btn btn-primary"><span>+</span> Thêm sản phẩm</a>
+{% endblock %}
+
+{% block content %}
+<section class="overview">
+    <article class="overview-feature">
+        <p class="eyebrow">GIÁ TRỊ HÀNG TỒN</p>
+        <div class="total"><strong>{{ stats.value|vnd }}</strong></div>
+        <div class="health">
+            <span>Sức khỏe kho</span><span>{{ stats.health }}% còn hàng đủ</span>
+        </div>
+        <div class="health-track"><span style="width: {{ stats.health }}%"></span></div>
+    </article>
+    <article class="stat">
+        <span class="stat-label"><i class="dot dot-green"></i>Tổng sản phẩm</span>
+        <strong>{{ stats.total }}</strong>
+        <small>{{ stats.units|default:0 }} đơn vị đang tồn</small>
+    </article>
+    <a class="stat" href="?status=low_stock">
+        <span class="stat-label"><i class="dot dot-amber"></i>Sắp hết hàng<em>›</em></span>
+        <strong>{{ stats.low_stock }}</strong>
+        <small>Còn từ 1 đến 5 sản phẩm</small>
+    </a>
+    <a class="stat" href="?status=out_of_stock">
+        <span class="stat-label"><i class="dot dot-red"></i>Hết hàng<em>›</em></span>
+        <strong>{{ stats.out_of_stock }}</strong>
+        <small>Cần nhập thêm</small>
+    </a>
+</section>
+
+<section class="workspace">
+    <div class="workspace-heading">
+        <div>
+            <h2>Danh sách sản phẩm <span>{{ page_obj.paginator.count|default:0 }}</span></h2>
+            <p>Bấm vào tên sản phẩm để xem chi tiết.</p>
+        </div>
+        <p class="stock-total">Tổng tồn kho <strong>{{ stats.units|default:0 }}</strong></p>
+    </div>
+
+    <nav class="status-tabs" aria-label="Lọc theo tình trạng">
+        {% for tab in status_tabs %}
+        <a href="?{{ tab.query }}" {% if tab.active %}aria-current="page"{% endif %}>{{ tab.label }} <span>{{ tab.count }}</span></a>
+        {% endfor %}
+    </nav>
+
+    <form method="get" class="filters">
+        {% if current.status %}<input type="hidden" name="status" value="{{ current.status }}">{% endif %}
+        <label><span>Tìm kiếm</span>
+            <input type="search" name="q" value="{{ current.q }}" placeholder="Tên sản phẩm hoặc mã SKU…">
+        </label>
+        <label><span>Danh mục</span>
+            <select name="category">
+                <option value="">Mọi danh mục</option>
+                {% for c in categories %}
+                <option value="{{ c.pk }}" {% if current.category == c.pk|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
+                {% endfor %}
+                <option value="none" {% if current.category == "none" %}selected{% endif %}>Chưa phân loại</option>
+            </select>
+        </label>
+        <label><span>Sắp xếp</span>
+            <select name="sort">
+                {% for value, label in sort_options %}
+                <option value="{{ value }}" {% if current.sort == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <div class="filter-actions">
+            <button type="submit" class="btn btn-primary">Lọc</button>
+            {% if is_filtered %}<a href="{% url 'inventory:product_list' %}" class="btn">Xóa lọc</a>{% endif %}
+        </div>
+    </form>
+
+    <div class="table-wrap">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Sản phẩm</th>
+                    <th>Danh mục</th>
+                    <th class="num">Giá bán</th>
+                    <th class="num">Tồn kho</th>
+                    <th>Tình trạng</th>
+                    <th class="num">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in products %}
+                <tr class="{% if not p.is_active %}row-muted{% endif %}">
+                    <td>
+                        <div class="product-cell">
+                            <span class="thumb" aria-hidden="true">{{ p.name|slice:":1"|upper }}</span>
+                            <div>
+                                <a href="{{ p.get_absolute_url }}" class="product-name">{{ p.name }}</a>
+                                <small class="sku">{{ p.sku }}{% if not p.is_active %} · Ngừng bán{% endif %}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{% if p.category %}<a class="link-strong" href="{{ p.category.get_absolute_url }}">{{ p.category }}</a>{% else %}—{% endif %}</td>
+                    <td class="num price">{{ p.price|vnd }}</td>
+                    <td class="num">{{ p.quantity }}</td>
+                    <td><span class="badge badge-{{ p.stock_status }}"><i></i>{{ p.stock_label }}</span></td>
+                    <td class="num row-actions">
+                        <a href="{% url 'inventory:product_update' p.pk %}" class="btn btn-sm">Sửa</a>
+                        <a href="{% url 'inventory:product_delete' p.pk %}" class="btn btn-sm btn-danger-ghost">Xóa</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="empty">
+                        {% if is_filtered %}
+                            Không có sản phẩm nào khớp bộ lọc. <a href="{% url 'inventory:product_list' %}">Xem tất cả</a>
+                        {% else %}
+                            Chưa có sản phẩm nào. <a href="{% url 'inventory:product_create' %}">Thêm sản phẩm đầu tiên</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if is_paginated %}
+    <nav class="pager" aria-label="Phân trang">
+        {% if page_obj.has_previous %}
+        <a class="btn btn-sm" href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.previous_page_number }}">← Trước</a>
+        {% endif %}
+        <span>Trang {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a class="btn btn-sm" href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.next_page_number }}">Sau →</a>
+        {% endif %}
+    </nav>
+    {% endif %}
+</section>
+{% endblock %}

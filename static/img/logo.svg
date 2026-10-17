@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Siêu Nhân Bán iPhone">
+  <!-- Logo tu ve: mu sieu nhan do kieu sentai. Muon dung anh khac thi thay file nay (giu ten logo.svg)
+       hoac doi duong dan trong templates/base.html. -->
+  <defs>
+    <linearGradient id="helmet" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff4b3e"/>
+      <stop offset="1" stop-color="#c3151b"/>
+    </linearGradient>
+    <linearGradient id="visor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b3340"/>
+      <stop offset="1" stop-color="#0b0f16"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="#172d46"/>
+  <!-- than mu -->
+  <path d="M32 7c-12.7 0-21 9.2-21 21.5V44c0 3.8 2.4 7.1 6 8.3l7.5 2.6h15l7.5-2.6c3.6-1.2 6-4.5 6-8.3V28.5C53 16.2 44.7 7 32 7z" fill="url(#helmet)"/>
+  <!-- vien vang tren dinh -->
+  <path d="M32 9.5l4.5 9.5h-9z" fill="#ffd34d"/>
+  <!-- kinh mat chu T -->
+  <path d="M15 27.5c0-1.4 1.1-2.5 2.5-2.5h29c1.4 0 2.5 1.1 2.5 2.5v4c0 1.4-1.1 2.5-2.5 2.5H37v9.5c0 1.4-1.1 2.5-2.5 2.5h-5c-1.4 0-2.5-1.1-2.5-2.5V34h-9.5c-1.4 0-2.5-1.1-2.5-2.5z" fill="url(#visor)"/>
+  <path d="M18 27.5h12" stroke="#7fa6d8" stroke-width="1.6" stroke-linecap="round" opacity=".7"/>
+  <!-- tam bac phia mieng -->
+  <path d="M25 48.5h14l-2.5 4.5h-9z" fill="#d9dee6"/>
+</svg>

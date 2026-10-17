@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}{% if object %}Sửa danh mục{% else %}Thêm danh mục{% endif %}{% endblock %}
+{% block breadcrumb %}<span>›</span><a href="{% url 'inventory:category_list' %}">Danh mục</a>{% if object %}<span>›</span><a href="{{ object.get_absolute_url }}">{{ object.name }}</a>{% endif %}{% endblock %}
+{% block heading %}{% if object %}Sửa danh mục “{{ object.name }}”{% else %}Thêm danh mục{% endif %}{% endblock %}
+
+{% block actions %}
+    <a href="{% url 'inventory:category_list' %}" class="btn btn-ghost">Hủy</a>
+    <button type="submit" form="category-form" class="btn btn-primary">{% if object %}Lưu thay đổi{% else %}Thêm danh mục{% endif %}</button>
+{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <form method="post" id="category-form" novalidate>
+        {% csrf_token %}
+        {% include "inventory/_field.html" with field=form.name %}
+        {% include "inventory/_field.html" with field=form.description %}
+        <div class="form-actions">
+            <a href="{% url 'inventory:category_list' %}" class="btn btn-ghost">Hủy</a>
+            <button type="submit" class="btn btn-primary">{% if object %}Lưu thay đổi{% else %}Thêm danh mục{% endif %}</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

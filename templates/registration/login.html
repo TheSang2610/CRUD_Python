@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Đăng nhập{% endblock %}
+{% block breadcrumb %}<span>›</span><span>Đăng nhập</span>{% endblock %}
+{% block eyebrow %}TÀI KHOẢN{% endblock %}
+{% block heading %}Đăng <span>nhập</span>{% endblock %}
+{% block lead %}<p class="lead">Đăng nhập để thêm, sửa và xóa sản phẩm, danh mục.</p>{% endblock %}
+
+{% block content %}
+<section class="panel panel-narrow">
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="form-error">Sai tên đăng nhập hoặc mật khẩu.</div>{% endif %}
+        {% include "inventory/_field.html" with field=form.username %}
+        {% include "inventory/_field.html" with field=form.password %}
+        <input type="hidden" name="next" value="{{ next }}">
+        <div class="form-actions">
+            <a href="{% url 'inventory:product_list' %}" class="btn btn-ghost">Quay lại</a>
+            <button type="submit" class="btn btn-primary">Đăng nhập</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

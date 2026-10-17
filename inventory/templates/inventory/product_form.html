@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}{% if object %}Sửa {{ object.name }}{% else %}Thêm sản phẩm{% endif %}{% endblock %}
+{% block breadcrumb %}<span>›</span><a href="{% url 'inventory:product_list' %}">Sản phẩm</a><span>›</span><span>{% if object %}Sửa{% else %}Thêm mới{% endif %}</span>{% endblock %}
+{% block eyebrow %}{% if object %}CẬP NHẬT{% else %}TẠO MỚI{% endif %}{% endblock %}
+{% block heading %}{% if object %}Sửa <span>{{ object.name }}</span>{% else %}Thêm <span>sản phẩm</span>{% endif %}{% endblock %}
+
+{% block actions %}
+    <a href="{% if object %}{{ object.get_absolute_url }}{% else %}{% url 'inventory:product_list' %}{% endif %}" class="btn btn-ghost">Hủy</a>
+    {# form="product-form": nut nam ngoai the <form> van gui duoc form ben duoi. #}
+    <button type="submit" form="product-form" class="btn btn-primary">{% if object %}Lưu thay đổi{% else %}Thêm sản phẩm{% endif %}</button>
+{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <form method="post" id="product-form" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="form-error">{{ form.non_field_errors }}</div>{% endif %}
+
+        <div class="grid-2">
+            {% include "inventory/_field.html" with field=form.name %}
+            {% include "inventory/_field.html" with field=form.sku %}
+            {% include "inventory/_field.html" with field=form.category %}
+            {% include "inventory/_field.html" with field=form.price %}
+            {% include "inventory/_field.html" with field=form.quantity %}
+        </div>
+        {% include "inventory/_field.html" with field=form.description %}
+
+        <label class="check-row">
+            {{ form.is_active }} <span>{{ form.is_active.label }}</span>
+        </label>
+
+        <div class="form-actions">
+            <a href="{% if object %}{{ object.get_absolute_url }}{% else %}{% url 'inventory:product_list' %}{% endif %}" class="btn btn-ghost">Hủy</a>
+            <button type="submit" class="btn btn-primary">{% if object %}Lưu thay đổi{% else %}Thêm sản phẩm{% endif %}</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Xóa {{ object }}{% endblock %}
+{% block eyebrow %}XÁC NHẬN{% endblock %}
+{% block heading %}Xóa <span>{{ kind }}</span>?{% endblock %}
+
+{% block content %}
+<section class="panel confirm">
+    <p>Bạn sắp xóa {{ kind }} <strong>{{ object }}</strong>. Thao tác này không hoàn tác được.</p>
+    {% if note %}<p class="field-help">{{ note }}</p>{% endif %}
+    <form method="post" class="form-actions">
+        {% csrf_token %}
+        <a href="{{ cancel_url }}" class="btn btn-ghost">Không, quay lại</a>
+        <button type="submit" class="btn btn-danger">Xóa {{ kind }}</button>
+    </form>
+</section>
+{% endblock %}

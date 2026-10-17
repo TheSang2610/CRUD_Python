@@ -1,0 +1,89 @@
+{% load static %}<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Kho hàng{% endblock %} · Siêu Nhân Bán iPhone</title>
+    <link rel="icon" type="image/svg+xml" href="{% static 'img/logo.svg' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/app.css' %}?v=4">
+</head>
+<body>
+<div class="console">
+    {% with name=request.resolver_match.url_name %}
+    <aside class="sidebar">
+        <a class="brand" href="{% url 'inventory:product_list' %}">
+            <img class="brand-mark" src="{% static 'img/logo.svg' %}" alt="" width="44" height="44">
+            <span><strong>Siêu Nhân Bán iPhone</strong><small>Quản lý kho hàng</small></span>
+        </a>
+
+        <p class="nav-caption">Vận hành</p>
+        <nav class="nav">
+            <a href="{% url 'inventory:product_list' %}" class="{% if name|slice:':7' == 'product' %}active{% endif %}">
+                <span class="nav-icon" aria-hidden="true">▦</span> Sản phẩm
+            </a>
+            <a href="{% url 'inventory:category_list' %}" class="{% if name|slice:':8' == 'category' %}active{% endif %}">
+                <span class="nav-icon" aria-hidden="true">◫</span> Danh mục
+            </a>
+            <a href="{% url 'inventory:product_create' %}" class="{% if name == 'product_create' %}sub-active{% endif %}">
+                <span class="nav-icon" aria-hidden="true">＋</span> Thêm sản phẩm
+            </a>
+        </nav>
+
+        {% if user.is_authenticated %}
+        <div class="user-card">
+            <span class="avatar" aria-hidden="true">{{ user.username|slice:":2"|upper }}</span>
+            <div><strong>{{ user.get_full_name|default:user.username }}</strong><span>Đang đăng nhập</span></div>
+        </div>
+        {# Django 5 chi cho dang xuat bang POST, nen la mot form chu khong phai link. #}
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="side-link side-button">⇥ Đăng xuất</button>
+        </form>
+        {% else %}
+        <div class="user-card">
+            <span class="avatar" aria-hidden="true">?</span>
+            <div><strong>Khách</strong><span>Chỉ xem, chưa sửa được</span></div>
+        </div>
+        <a class="side-link" href="{% url 'login' %}?next={{ request.path|urlencode }}">→ Đăng nhập để quản lý</a>
+        {% endif %}
+        <a class="side-link" href="{% url 'admin:index' %}">↗ Trang Django Admin</a>
+    </aside>
+    {% endwith %}
+
+    <section class="content">
+        <header class="commandbar">
+            <div><i aria-hidden="true"></i><span>Siêu Nhân Bán iPhone · Vận hành</span><b>Kho trung tâm</b></div>
+            <span class="role-chip">{% if user.is_authenticated %}Quản lý{% else %}Khách{% endif %}</span>
+        </header>
+
+        <div class="page">
+            <nav class="breadcrumb" aria-label="Đường dẫn">
+                <a href="{% url 'inventory:product_list' %}">Tổng quan</a>
+                {% block breadcrumb %}{% endblock %}
+            </nav>
+
+            <header class="heading">
+                <div>
+                    <p class="eyebrow">{% block eyebrow %}KHO HÀNG{% endblock %}</p>
+                    <h1>{% block heading %}{% endblock %}</h1>
+                    {% block lead %}{% endblock %}
+                </div>
+                <div class="heading-actions">{% block actions %}{% endblock %}</div>
+            </header>
+
+            {% if messages %}
+            <div class="toasts">
+                {% for message in messages %}
+                <div class="toast toast-{{ message.tags }}" role="status">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </section>
+</div>
+</body>
+</html>

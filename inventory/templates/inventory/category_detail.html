@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load money %}
+
+{% block title %}{{ category.name }}{% endblock %}
+{% block breadcrumb %}<span>›</span><a href="{% url 'inventory:category_list' %}">Danh mục</a><span>›</span><span>{{ category.name }}</span>{% endblock %}
+{% block eyebrow %}CHI TIẾT DANH MỤC{% endblock %}
+{% block heading %}{{ category.name }}{% endblock %}
+{% block lead %}<p class="lead">{{ category.description|default:"Chưa có mô tả." }}</p>{% endblock %}
+{% block actions %}
+    <a href="{% url 'inventory:product_create' %}?category={{ category.pk }}" class="btn btn-primary"><span>＋</span> Thêm sản phẩm</a>
+    <a href="{% url 'inventory:category_update' category.pk %}" class="btn btn-dark">Sửa</a>
+    <a href="{% url 'inventory:category_delete' category.pk %}" class="btn btn-danger-ghost">Xóa</a>
+{% endblock %}
+
+{% block content %}
+<section class="detail">
+    <div class="panel panel-flush">
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th class="num">Giá bán</th>
+                        <th class="num">Tồn kho</th>
+                        <th>Tình trạng</th>
+                        <th class="num">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in products %}
+                    <tr class="{% if not p.is_active %}row-muted{% endif %}">
+                        <td>
+                            <div class="product-cell">
+                                <span class="thumb" aria-hidden="true">{{ p.name|slice:":1"|upper }}</span>
+                                <div>
+                                    <a href="{{ p.get_absolute_url }}" class="product-name">{{ p.name }}</a>
+                                    <small class="sku">{{ p.sku }}{% if not p.is_active %} · Ngừng bán{% endif %}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="num price">{{ p.price|vnd }}</td>
+                        <td class="num">{{ p.quantity }}</td>
+                        <td><span class="badge badge-{{ p.stock_status }}"><i></i>{{ p.stock_label }}</span></td>
+                        <td class="num row-actions">
+                            <a href="{% url 'inventory:product_update' p.pk %}" class="btn btn-sm">Sửa</a>
+                            <a href="{% url 'inventory:product_delete' p.pk %}" class="btn btn-sm btn-danger-ghost">Xóa</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="empty">
+                            Danh mục này chưa có sản phẩm nào.
+                            <a href="{% url 'inventory:product_create' %}?category={{ category.pk }}">Thêm sản phẩm đầu tiên</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <dl class="panel facts">
+        <div><dt>Số sản phẩm</dt><dd>{{ stats.total }}</dd></div>
+        <div><dt>Tổng số lượng tồn</dt><dd>{{ stats.units|default:0 }}</dd></div>
+        <div><dt>Giá trị tồn kho</dt><dd>{{ stats.value|default:0|vnd }}</dd></div>
+        <div><dt>Ngày tạo</dt><dd>{{ category.created_at|date:"d/m/Y H:i" }}</dd></div>
+    </dl>
+</section>
+{% endblock %}

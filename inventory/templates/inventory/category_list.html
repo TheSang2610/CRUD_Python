@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Danh mục{% endblock %}
+{% block breadcrumb %}<span>›</span><span>Danh mục</span>{% endblock %}
+{% block eyebrow %}PHÂN LOẠI{% endblock %}
+{% block heading %}Danh mục <span>sản phẩm</span>{% endblock %}
+{% block lead %}<p class="lead">Nhóm sản phẩm theo ngành hàng để lọc và thống kê nhanh hơn.</p>{% endblock %}
+
+{% block content %}
+<section class="split">
+    <div class="panel">
+        <h2 class="section-title">Thêm danh mục</h2>
+        {% if user.is_authenticated %}
+        <form method="post" action="{% url 'inventory:category_create' %}" novalidate>
+            {% csrf_token %}
+            {% include "inventory/_field.html" with field=form.name %}
+            {% include "inventory/_field.html" with field=form.description %}
+            <button type="submit" class="btn btn-primary btn-block">Thêm danh mục</button>
+        </form>
+        {% else %}
+        <p class="field-help">Cần đăng nhập để thêm, sửa hoặc xóa danh mục.</p>
+        <a href="{% url 'login' %}?next={{ request.path|urlencode }}" class="btn btn-primary btn-block">Đăng nhập</a>
+        {% endif %}
+    </div>
+
+    <div class="panel">
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr><th>Tên danh mục</th><th>Mô tả</th><th class="num">Sản phẩm</th><th class="num">Thao tác</th></tr>
+                </thead>
+                <tbody>
+                    {% for c in categories %}
+                    <tr>
+                        <td>
+                            <a class="link-strong" href="{{ c.get_absolute_url }}">{{ c.name }}</a>
+                            {% if c.product_count %}
+                            <div class="chips">
+                                {% for p in c.products.all|slice:":3" %}<a class="chip" href="{{ p.get_absolute_url }}">{{ p.name }}</a>{% endfor %}
+                                {% if c.product_count > 3 %}<a class="chip chip-more" href="{{ c.get_absolute_url }}">+{{ c.product_count|add:"-3" }} khác</a>{% endif %}
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>{{ c.description|default:"—" }}</td>
+                        <td class="num">{{ c.product_count }}</td>
+                        <td class="num row-actions">
+                            <a href="{{ c.get_absolute_url }}" class="btn btn-sm">Xem</a>
+                            <a href="{% url 'inventory:product_create' %}?category={{ c.pk }}" class="btn btn-sm btn-ghost">+ SP</a>
+                            <a href="{% url 'inventory:category_update' c.pk %}" class="btn btn-sm btn-ghost">Sửa</a>
+                            <a href="{% url 'inventory:category_delete' c.pk %}" class="btn btn-sm btn-danger-ghost">Xóa</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="empty">Chưa có danh mục nào. Thêm ở khung bên trái.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}
